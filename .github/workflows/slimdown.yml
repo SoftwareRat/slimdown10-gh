@@ -19,8 +19,7 @@ jobs:
       run: |
         $url = "https://isofiles.bd581e55.workers.dev/Windows%2010/Windows%2010%20Enterprise%20LTSC%202021/en-us_windows_10_iot_enterprise_ltsc_2021_x64_dvd_257ad90f.iso"
         $outputPath = "Windows10_x64_en-US.iso"
-        $job = Start-BitsTransfer -Source $url -Destination $outputPath -TransferType Download -Priority Foreground
-        $job | Wait-BitsTransfer
+        Invoke-WebRequest -Uri $url -OutFile $outputPath
     - name: Run Slimdown10.bat
       run: |
         cmd /c Slimdown10.bat
