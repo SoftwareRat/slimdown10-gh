@@ -5,6 +5,7 @@ on:
     branches: [ main ]
   pull_request:
     branches: [ main ]
+  workflow_dispatch:  # allows the workflow to be triggered manually
 
 jobs:
   slimdown:
