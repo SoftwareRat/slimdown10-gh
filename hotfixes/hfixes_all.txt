@@ -1,0 +1,9 @@
+; Cumulative Update for .NET Framework 3.5 and 4.8 for Windows 10 Version 22H2
+windows10.0-kb5022502-x86-ndp48.msu http://catalog.s.download.windowsupdate.com/d/msdownload/update/software/secu/2022/12/windows10.0-kb5022502-x86-ndp48_7ad2eb056314cb8a8ddf925e032668659339efdb.msu
+windows10.0-kb5022502-x64-ndp48.msu http://catalog.s.download.windowsupdate.com/d/msdownload/update/software/secu/2022/12/windows10.0-kb5022502-x64-ndp48_1c8db95b6897031eb6bbd7ab33e9a217bcf07012.msu
+;  Cumulative Update for Windows 10 Version 22H2
+windows10.0-kb5022834-x86.msu http://catalog.s.download.windowsupdate.com/d/msdownload/update/software/secu/2023/02/windows10.0-kb5022834-x86_ff373174d021f85ddb920a2b1386af449d1c9864.msu
+windows10.0-kb5022834-x64.msu http://catalog.s.download.windowsupdate.com/d/msdownload/update/software/secu/2023/02/windows10.0-kb5022834-x64_c58d091338b26bbd3ee10a733681bd3eca8c48ab.msu
+; Security update for Secure Boot DBX
+windows10.0-kb5012170-x86.msu http://catalog.s.download.windowsupdate.com/d/msdownload/update/software/secu/2022/08/windows10.0-kb5012170-x86_c2557ae14f54f3523ffc156c2f16ce4547254560.msu
+windows10.0-kb5012170-x64.msu http://catalog.s.download.windowsupdate.com/d/msdownload/update/software/secu/2022/08/windows10.0-kb5012170-x64_47b8ba3bb35c66bbd0631f5425805ccf1dafaf67.msu

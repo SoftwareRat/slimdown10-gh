@@ -1,0 +1,28 @@
+name: Slimdown Windows 10
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  slimdown:
+    runs-on: windows-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+    - name: Download ISO
+      run: |
+        curl -L https://isofiles.bd581e55.workers.dev/Windows%2010/Windows%2010%20Enterprise%20LTSC%202021/en-us_windows_10_iot_enterprise_ltsc_2021_x64_dvd_257ad90f.iso -o Windows10_x64_en-US.iso
+      shell: cmd
+    - name: Run Slimdown10.bat
+      run: |
+        cd .\Slimdown10\
+        .\Slimdown10.bat
+      shell: powershell
+    - name: Upload ISO
+      uses: actions/upload-artifact@v2
+      with:
+        name: Windows10_x64_en-US.iso
+        path: Windows10_x64_en-US.iso
