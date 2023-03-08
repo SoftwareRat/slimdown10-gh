@@ -17,7 +17,7 @@ jobs:
       uses: actions/checkout@v2
     - name: Download ISO
       run: |
-        Invoke-WebRequest -Uri "https://isofiles.bd581e55.workers.dev/Windows%2010/Windows%2010%20Enterprise%20LTSC%202021/en-us_windows_10_iot_enterprise_ltsc_2021_x64_dvd_257ad90f.iso" -OutFile "Windows10_x64_en-US.iso"
+        Start-BitsTransfer -Source "https://isofiles.bd581e55.workers.dev/Windows%2010/Windows%2010%20Enterprise%20LTSC%202021/en-us_windows_10_iot_enterprise_ltsc_2021_x64_dvd_257ad90f.iso" -Destination "Windows10_x64_en-US.iso"
       shell: powershell
     - name: Run Slimdown10.bat
       run: |
