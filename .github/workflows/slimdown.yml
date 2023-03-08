@@ -13,59 +13,21 @@ jobs:
   slimdown:
     runs-on: windows-latest
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-
-      - name: Download ISO
-        run: |
-          $url = "https://isofiles.bd581e55.workers.dev/Windows%2010/Windows%2010%20Enterprise%20LTSC%202021/en-us_windows_10_iot_enterprise_ltsc_2021_x64_dvd_257ad90f.iso"
-          $outputPath = "Windows10_x64_en-US.iso"
-          $chunkSize = 52428800 # 50 MB
-
-          # Get the total file size
-          $totalFileSize = (Invoke-WebRequest -Uri $url).Headers["Content-Length"]
-
-          # Initialize variables
-          $bytesDownloaded = 0
-          $fileStream = New-Object System.IO.FileStream ($outputPath), 'Append', 'Write', 'Read'
-          $webRequest = [System.Net.HttpWebRequest]::Create($url)
-
-          # Download the file in chunks
-          while ($bytesDownloaded -lt $totalFileSize) {
-              # Calculate the range of bytes to download
-              $startRange = $bytesDownloaded
-              $endRange = [Math]::Min(($bytesDownloaded + $chunkSize), $totalFileSize) - 1
-
-              # Set the range header
-              $webRequest.AddRange($startRange, $endRange)
-
-              # Get the response and download the chunk
-              $webResponse = $webRequest.GetResponse()
-              $stream = $webResponse.GetResponseStream()
-              $buffer = New-Object byte[] $chunkSize
-              $bytesRead = $stream.Read($buffer, 0, $chunkSize)
-              while ($bytesRead -gt 0) {
-                  $fileStream.Write($buffer, 0, $bytesRead)
-                  $bytesDownloaded += $bytesRead
-                  $bytesRead = $stream.Read($buffer, 0, $chunkSize)
-              }
-
-              # Cleanup
-              $stream.Dispose()
-              $webResponse.Dispose()
-          }
-
-          # Cleanup
-          $fileStream.Dispose()
-
-      - name: Run Slimdown10.bat
-        run: |
-          cmd /c Slimdown10.bat
-        shell: powershell
-        working-directory: ${{ github.workspace }}
-
-      - name: Upload ISO
-        uses: actions/upload-artifact@v2
-        with:
-          name: Windows10_x64_en-US.iso
-          path: Windows10_x64_en-US.iso
+    - name: Checkout code
+      uses: actions/checkout@v2
+    - name: Download ISO
+      run: |
+        $url = "https://isofiles.bd581e55.workers.dev/Windows%2010/Windows%2010%20Enterprise%20LTSC%202021/en-us_windows_10_iot_enterprise_ltsc_2021_x64_dvd_257ad90f.iso"
+        $outputPath = "Windows10_x64_en-US.iso"
+        $job = Start-BitsTransfer -Source $url -Destination $outputPath -TransferType Download -Priority Foreground
+        $job | Wait-BitsTransfer
+    - name: Run Slimdown10.bat
+      run: |
+        cmd /c Slimdown10.bat
+      shell: powershell
+      working-directory: ${{ github.workspace }}
+    - name: Upload ISO
+      uses: actions/upload-artifact@v2
+      with:
+        name: Windows10_x64_en-US.iso
+        path: Windows10_x64_en-US.iso
