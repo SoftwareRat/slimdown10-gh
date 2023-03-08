@@ -20,12 +20,22 @@ jobs:
       working-directory: ${{ github.workspace }}
       run: |
         $isoPath = "${{ github.workspace }}/en-us_windows_10_iot_enterprise_ltsc_2021_x64_dvd_257ad90f.iso"
-        if (Test-Path $isoPath) {
-        Write-Host "ISO file already exists in working directory."
-        } else {
-        $url = "https://isofiles.bd581e55.workers.dev/Windows%2010/Windows%2010%20Enterprise%20LTSC%202021/en-us_windows_10_iot_enterprise_ltsc_2021_x64_dvd_257ad90f.iso"
-        $outputPath = "en-us_windows_10_iot_enterprise_ltsc_2021_x64_dvd_257ad90f.iso"
-        Invoke-WebRequest -Uri $url -OutFile $outputPath
+        $expectedSha1 = "76c3c10e38307d29fd8b4748522ed144dba35829"
+        while ($true) {
+          if (Test-Path $isoPath) {
+            $actualSha1 = $(Get-FileHash $isoPath -Algorithm SHA1).Hash.ToLower()
+            if ($actualSha1 -eq $expectedSha1) {
+              Write-Host "ISO file already exists in working directory and has correct SHA1 hash."
+              break
+            } else {
+              Write-Host "Deleting ISO file because its SHA1 hash doesn't match the expected value."
+              Remove-Item $isoPath
+            }
+          }
+          $url = "https://isofiles.bd581e55.workers.dev/Windows%2010/Windows%2010%20Enterprise%20LTSC%202021/en-us_windows_10_iot_enterprise_ltsc_2021_x64_dvd_257ad90f.iso"
+          $outputPath = "en-us_windows_10_iot_enterprise_ltsc_2021_x64_dvd_257ad90f.iso"
+          Write-Host "Downloading ISO file from $url to $outputPath ..."
+          & "${{ github.workspace }}/tools/amd64/wget.exe" $url --output-document=$outputPath
         }
     - name: Run Slimdown10.cmd
       shell: cmd
@@ -36,4 +46,4 @@ jobs:
       uses: actions/upload-artifact@v2
       with:
         name: Windows10_x64_en-US.iso
-        path: en-us_windows_10_iot_enterprise_ltsc_2021_x64_dvd_257ad90f.iso
+        path: Windows10_x64_en-US.iso
