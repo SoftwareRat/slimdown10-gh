@@ -16,23 +16,24 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v2
     - name: Download ISO
+      shell: powershell
+      working-directory: ${{ github.workspace }}
       run: |
         $isoPath = "${{ github.workspace }}/en-us_windows_10_iot_enterprise_ltsc_2021_x64_dvd_257ad90f.iso"
         if (Test-Path $isoPath) {
-          Write-Host "ISO file already exists in working directory."
+        Write-Host "ISO file already exists in working directory."
         } else {
-          $url = "https://isofiles.bd581e55.workers.dev/Windows%2010/Windows%2010%20Enterprise%20LTSC%202021/en-us_windows_10_iot_enterprise_ltsc_2021_x64_dvd_257ad90f.iso"
-          $outputPath = "en-us_windows_10_iot_enterprise_ltsc_2021_x64_dvd_257ad90f.iso"
-          Invoke-WebRequest -Uri $url -OutFile $outputPath
+        $url = "https://isofiles.bd581e55.workers.dev/Windows%2010/Windows%2010%20Enterprise%20LTSC%202021/en-us_windows_10_iot_enterprise_ltsc_2021_x64_dvd_257ad90f.iso"
+        $outputPath = "en-us_windows_10_iot_enterprise_ltsc_2021_x64_dvd_257ad90f.iso"
+        Invoke-WebRequest -Uri $url -OutFile $outputPath
         }
-        working-directory: ${{ github.workspace }}
     - name: Run Slimdown10.cmd
-      run: |
-        cmd /c Slimdown10.cmd
-      shell: powershell
+      shell: cmd
       working-directory: ${{ github.workspace }}
+      run: |
+        Slimdown10.cmd
     - name: Upload ISO
       uses: actions/upload-artifact@v2
       with:
         name: Windows10_x64_en-US.iso
-        path: Windows10_x64_en-US.iso
+        path: en-us_windows_10_iot_enterprise_ltsc_2021_x64_dvd_257ad90f.iso
