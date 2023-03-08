@@ -16,13 +16,13 @@ jobs:
     - name: Download ISO
       run: |
         Start-BitsTransfer -Source "https://isofiles.bd581e55.workers.dev/Windows%2010/Windows%2010%20Enterprise%20LTSC%202021/en-us_windows_10_iot_enterprise_ltsc_2021_x64_dvd_257ad90f.iso" -Destination "Windows10_x64_en-US.iso"
+        Set-Location -Path ${{ github.workspace }}
       shell: powershell
-      working-directory: ${{ github.workspace }}
     - name: Run Slimdown10.bat
       run: |
+        cd ${{ github.workspace }}
         .\Slimdown10.bat
       shell: cmd
-      working-directory: ${{ github.workspace }}
     - name: Upload ISO
       uses: actions/upload-artifact@v2
       with:
