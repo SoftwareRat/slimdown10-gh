@@ -20,9 +20,9 @@ jobs:
         $url = "https://isofiles.bd581e55.workers.dev/Windows%2010/Windows%2010%20Enterprise%20LTSC%202021/en-us_windows_10_iot_enterprise_ltsc_2021_x64_dvd_257ad90f.iso"
         $outputPath = "Windows10_x64_en-US.iso"
         Invoke-WebRequest -Uri $url -OutFile $outputPath
-    - name: Run Slimdown10.bat
+    - name: Run Slimdown10.cmd
       run: |
-        cmd /c Slimdown10.bat
+        cmd /c Slimdown10.cmd
       shell: powershell
       working-directory: ${{ github.workspace }}
     - name: Upload ISO
