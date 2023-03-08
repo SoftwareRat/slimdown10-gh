@@ -248,7 +248,6 @@ if not "%checkErrors%"=="0" (
  goto end
 )
 
-
 setlocal EnableDelayedExpansion
 ECHO.
 ECHO.
@@ -263,13 +262,15 @@ for /L %%i in (%ImageStart%, 1, %ImageCount%) do (
     set "ImageName=!ImageName:~1!"
     if /i "!ImageName!"=="IoT Enterprise" (
       set "ImageIndex=%%i"
-      goto :imageFound
     )
   )
 )
-echo Failed to find the IoT Enterprise image in the ISO/DVD.
-echo.
-goto :end
+
+if not defined ImageIndex (
+  echo Failed to find the IoT Enterprise image in the ISO/DVD.
+  echo.
+  goto :end
+)
 
 :imageFound
 echo Found the following image in ISO/DVD:
