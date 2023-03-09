@@ -46,6 +46,8 @@ jobs:
       working-directory: C:/slimdown10
       run: |
         Slimdown10.cmd
+    - name: Copy ISO to workspace
+      run: Copy-Item -Path "C:\slimdown10\Windows10_x64_en-US.iso" -Destination $env:GITHUB_WORKSPACE
     - name: Upload ISO
       uses: actions/upload-artifact@v2
       with:
