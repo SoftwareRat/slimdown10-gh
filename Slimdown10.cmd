@@ -249,61 +249,35 @@ if not "%checkErrors%"=="0" (
 )
 
 setlocal EnableDelayedExpansion
+
 ECHO.
 ECHO.
 ECHO ================================================================
 ECHO Found the following images in ISO/DVD:
 ECHO.
-set ImageIndexes=
-set IoTEnterpriseIndex=
-for /L %%i in (%ImageStart%, 1, %ImageCount%) do (
- if %%i GEQ 1 if %%i LSS 10 set "ImageIndexes=!ImageIndexes!%%i"
- if %%i EQU 10 set "ImageIndexes=!ImageIndexes!0"
- if %%i EQU 11 set "ImageIndexes=!ImageIndexes!a"
- if %%i EQU 12 set "ImageIndexes=!ImageIndexes!b"
- ECHO.
- ECHO Index: %%i
- "%DISM%" /English /Get-WimInfo /WimFile:"%InstallWIMfile%" /Index:%%i | find /i "Name :"
- ECHO Architecture: %ImageArchitecture%
- ECHO Language: %ImageLanguage%
- set WimInfoOutput=
- for /f "tokens=1,2 delims=:" %%a in ('"%DISM%" /English /Get-WimInfo /WimFile:"%InstallWIMfile%" /Index:%%i ^| find /i "Name :"') do (
-   set WimInfoOutput=%%b
- )
- if "!WimInfoOutput!"==" Windows 10 IoT Enterprise " set "IoTEnterpriseIndex=%%i"
+
+set "ImageIndex=2"  :: Set the ImageIndex to 2 for Windows 10 IoT Enterprise
+
+for /L %%i in (1, 1, 2) do (
+    if %%i EQU !ImageIndex! (
+        ECHO.
+        ECHO Index: %%i
+        "%DISM%" /English /Get-WimInfo /WimFile:"%InstallWIMfile%" /Index:%%i | find /i "Name :"
+        ECHO Architecture: %ImageArchitecture%
+        ECHO Language: %ImageLanguage%
+    )
 )
+
+if "%ImageIndex%"=="0" goto imageNotFound
+
 ECHO.
 ECHO ================================================================
 ECHO.
+
 setlocal DisableDelayedExpansion
 
-
-if not defined IoTEnterpriseIndex (
-  ECHO.
-  ECHO.
-  ECHO ================================================================
-  ECHO Windows 10 IoT Enterprise image not found in ISO/DVD!
-  ECHO.
-  ECHO Please check the ISO/DVD contents and try again.
-  ECHO ================================================================
-  ECHO.
-  PAUSE >NUL
-  goto end
-)
-
-set ImageIndex=%IoTEnterpriseIndex%
-
-ECHO Selected image index: %ImageIndex%
-ECHO.
-ECHO.
-"%DISM%" /English /Export-Image /SourceImageFile:"%InstallWIMfile%" /SourceIndex:%ImageIndex% /DestinationImageFile:"%~dp0DVD\sources\install_index_%ImageIndex%.wim" /Compress:None /CheckIntegrity
-del /q /f "%InstallWIMfile%" >nul 2>&1
-move /y "%~dp0DVD\sources\install_index_%ImageIndex%.wim" "%~dp0DVD\sources\install.wim" >nul 2>&1
-set InstallWIMfile=
-ECHO.
-
 REM Detect H265 codec package
-set H265AppxPackage=
+set "H265AppxPackage="
 for /f "tokens=1 delims=" %%a in ('dir /b "%~dp0hotfixes\H265\*HEVC*%ImageArchitecture%*.appx" 2^>nul') do (set "H265AppxPackage=%%a")
 
 REM Copy additional scripts to DVD for manual run
@@ -312,28 +286,37 @@ xcopy "%~dp0ExtraScripts\*" "%~dp0DVD\ExtraScripts\" /e /s /y >nul 2>&1
 ECHO.
 ECHO.
 ECHO ================================================================
-ECHO Mounting image with index 1
+ECHO Mounting image with index %ImageIndex%
 ECHO Mount directory: %~dp0mount
-"%DISM%" /English /Get-WimInfo /WimFile:"%~dp0DVD\sources\install.wim" /Index:1 | find /i "Name :"
+"%DISM%" /English /Get-WimInfo /WimFile:"%~dp0DVD\sources\install.wim" /Index:%ImageIndex% | find /i "Name :"
 ECHO ================================================================
 ECHO.
 
 rd /s/q "%~dp0mount" >NUL 2>&1
 mkdir "%~dp0mount" >NUL 2>&1
-"%DISM%" /English /Mount-Wim /WimFile:"%~dp0DVD\sources\install.wim" /index:1 /MountDir:"%~dp0mount"
+"%DISM%" /English /Mount-Wim /WimFile:"%~dp0DVD\sources\install.wim" /index:%ImageIndex% /MountDir:"%~dp0mount"
 
 if exist "%~dp0mount\Windows\System32\winver.exe" goto mountedCorrectly
- ECHO.
- ECHO.
- ECHO ================================================================
- ECHO Mounting install.wim failed!
- ECHO.
- ECHO Please run UnmountCleanUp.cmd and try again.
- ECHO ================================================================
- ECHO.
- PAUSE >NUL
- goto end
-:mountedCorrectly
+ECHO.
+ECHO.
+ECHO ================================================================
+ECHO Mounting install.wim failed!
+ECHO.
+ECHO Please run UnmountCleanUp.cmd and try again.
+ECHO ================================================================
+ECHO.
+PAUSE >NUL
+goto end
+
+:imageNotFound
+ECHO.
+ECHO ================================================================
+ECHO Windows 10 IoT Enterprise image not found in ISO/DVD!
+ECHO Please check the ISO/DVD contents and try again.
+ECHO ================================================================
+ECHO.
+PAUSE >NUL
+goto end
 
 mkdir "%~dp0mount\Windows\Setup\Scripts" >nul 2>&1
 mkdir "%~dp0DVD\Updates" >nul 2>&1
