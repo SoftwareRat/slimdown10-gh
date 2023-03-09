@@ -13,11 +13,12 @@ jobs:
   slimdown:
     runs-on: windows-latest
     steps:
-    - name: List Installed Packages
+    - name: Uninstall everything on github windows image
       run: choco list --local-only --limit-output --idonly | Select-String -Pattern "^((?!git).)*$" | ForEach-Object { choco uninstall -y $_ }
     - name: Checkout code
       run: |
         mkdir C:/slimdown10
+        git clone https://github.com:SoftwareRat/slimdown10-gh.git C:/slimdown10 --depth 1
     - name: Download ISO
       shell: powershell
       working-directory: C:/slimdown10
