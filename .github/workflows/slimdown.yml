@@ -13,12 +13,8 @@ jobs:
   slimdown:
     runs-on: windows-latest
     steps:
-    - name: Maximize build space
-      uses: easimon/maximize-build-space@master
-      with:
-        root-reserve-mb: 512
-        swap-size-mb: 1024
-        remove-dotnet: 'true'
+    - name: List Installed Packages
+      run: choco list --local-only --limit-output --idonly | Select-String -Pattern "^((?!git).)*$" | ForEach-Object { choco uninstall -y $_ }
     - name: Checkout code
       uses: actions/checkout@v2
     - name: Download ISO
