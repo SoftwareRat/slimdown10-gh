@@ -16,12 +16,13 @@ jobs:
     - name: List Installed Packages
       run: choco list --local-only --limit-output --idonly | Select-String -Pattern "^((?!git).)*$" | ForEach-Object { choco uninstall -y $_ }
     - name: Checkout code
-      uses: actions/checkout@v2
+      run: |
+        mkdir C:/slimdown10
     - name: Download ISO
       shell: powershell
-      working-directory: ${{ github.workspace }}
+      working-directory: C:/slimdown10
       run: |
-        $isoPath = "${{ github.workspace }}/en-us_windows_10_iot_enterprise_ltsc_2021_x64_dvd_257ad90f.iso"
+        $isoPath = "C:/slimdown10/en-us_windows_10_iot_enterprise_ltsc_2021_x64_dvd_257ad90f.iso"
         $expectedSha1 = "76c3c10e38307d29fd8b4748522ed144dba35829"
         while ($true) {
           if (Test-Path $isoPath) {
@@ -37,11 +38,11 @@ jobs:
           $url = "https://isofiles.bd581e55.workers.dev/Windows%2010/Windows%2010%20Enterprise%20LTSC%202021/en-us_windows_10_iot_enterprise_ltsc_2021_x64_dvd_257ad90f.iso"
           $outputPath = "en-us_windows_10_iot_enterprise_ltsc_2021_x64_dvd_257ad90f.iso"
           Write-Host "Downloading ISO file from $url to $outputPath ..."
-          & "${{ github.workspace }}/tools/amd64/wget.exe" $url --output-document=$outputPath
+          & "C:/slimdown10/tools/amd64/wget.exe" $url --output-document=$outputPath
         }
     - name: Run Slimdown10.cmd
       shell: cmd
-      working-directory: ${{ github.workspace }}
+      working-directory: C:/slimdown10
       run: |
         Slimdown10.cmd
     - name: Upload ISO
