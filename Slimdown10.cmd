@@ -248,51 +248,52 @@ if not "%checkErrors%"=="0" (
  goto end
 )
 
-
 setlocal EnableDelayedExpansion
 ECHO.
 ECHO.
 ECHO ================================================================
-ECHO Searching for IoT Enterprise image in ISO/DVD...
+ECHO Found the following images in ISO/DVD:
 ECHO.
 set ImageIndexes=
+set IoTEnterpriseIndex=
 for /L %%i in (%ImageStart%, 1, %ImageCount%) do (
-  set "ImageName="
-  for /f "tokens=2 delims=: " %%j in ('"%DISM%" /English /Get-WimInfo /WimFile:"%InstallWIMfile%" /Index:%%i ^| find /i "Name :"') do (
-    set "ImageName=%%j"
-    set "ImageName=!ImageName:~1!"
-    if /i "!ImageName!"=="IoT Enterprise" (
-      set "ImageIndex=%%i"
-      goto :imageFound
-    )
-  )
+ if %%i GEQ 1 if %%i LSS 10 set "ImageIndexes=!ImageIndexes!%%i"
+ if %%i EQU 10 set "ImageIndexes=!ImageIndexes!0"
+ if %%i EQU 11 set "ImageIndexes=!ImageIndexes!a"
+ if %%i EQU 12 set "ImageIndexes=!ImageIndexes!b"
+ ECHO.
+ ECHO Index: %%i
+ "%DISM%" /English /Get-WimInfo /WimFile:"%InstallWIMfile%" /Index:%%i | find /i "Name :"
+ ECHO Architecture: %ImageArchitecture%
+ ECHO Language: %ImageLanguage%
+ set WimInfoOutput=
+ for /f "tokens=1,2 delims=:" %%a in ('"%DISM%" /English /Get-WimInfo /WimFile:"%InstallWIMfile%" /Index:%%i ^| find /i "Name :"') do (
+   set WimInfoOutput=%%b
+ )
+ if "!WimInfoOutput!"==" Windows 10 IoT Enterprise " set "IoTEnterpriseIndex=%%i"
 )
-echo Failed to find the IoT Enterprise image in the ISO/DVD.
-echo.
-goto :end
-
-:imageFound
-echo Found the following image in ISO/DVD:
-ECHO.
-ECHO Index: %ImageIndex%
-"%DISM%" /English /Get-WimInfo /WimFile:"%InstallWIMfile%" /Index:%ImageIndex%
-ECHO Architecture: %ImageArchitecture%
-ECHO Language: %ImageLanguage%
-ECHO.
-ECHO Exporting the selected image...
-"%DISM%" /English /Export-Image /SourceImageFile:"%InstallWIMfile%" /SourceIndex:%ImageIndex% /DestinationImageFile:"%~dp0DVD\sources\install.wim" /Compress:None /CheckIntegrity
-del /q /f "%InstallWIMfile%" >nul 2>&1
-
-:end
 ECHO.
 ECHO ================================================================
 ECHO.
 setlocal DisableDelayedExpansion
 
-if "%ImageStart%"=="%ImageCount%" goto skipSelectImage
 
-CHOICE /C %ImageIndexes% /M "Choose image index"
-set /a ImageIndex=%ERRORLEVEL%
+if not defined IoTEnterpriseIndex (
+  ECHO.
+  ECHO.
+  ECHO ================================================================
+  ECHO Windows 10 IoT Enterprise image not found in ISO/DVD!
+  ECHO.
+  ECHO Please check the ISO/DVD contents and try again.
+  ECHO ================================================================
+  ECHO.
+  PAUSE >NUL
+  goto end
+)
+
+set ImageIndex=%IoTEnterpriseIndex%
+
+ECHO Selected image index: %ImageIndex%
 ECHO.
 ECHO.
 "%DISM%" /English /Export-Image /SourceImageFile:"%InstallWIMfile%" /SourceIndex:%ImageIndex% /DestinationImageFile:"%~dp0DVD\sources\install_index_%ImageIndex%.wim" /Compress:None /CheckIntegrity
@@ -300,10 +301,6 @@ del /q /f "%InstallWIMfile%" >nul 2>&1
 move /y "%~dp0DVD\sources\install_index_%ImageIndex%.wim" "%~dp0DVD\sources\install.wim" >nul 2>&1
 set InstallWIMfile=
 ECHO.
-SET ImageStart=
-SET ImageCount=
-
-:skipSelectImage
 
 REM Detect H265 codec package
 set H265AppxPackage=
