@@ -96,7 +96,6 @@ if ERRORLEVEL 1 (
  ECHO Please run it as the Administrator.
  ECHO =============================================
  ECHO.
- PAUSE >NUL
  goto end
 )
 
@@ -116,7 +115,6 @@ if not "%incorrectPath%"=="0" (
  ECHO Please copy and run script from Desktop or another directory!
  ECHO ================================================================
  ECHO.
- PAUSE >NUL
  goto end
 )
 
@@ -162,7 +160,6 @@ if "%ISOName%"=="" (
   ECHO Please copy Windows 10 22H2 ISO DVD to the same location as Slimdown10
   ECHO ========================================================================
   ECHO.
-  PAUSE >NUL
   goto end
  )
 )
@@ -193,7 +190,6 @@ if "%InstallWIMfile%"=="" (
  ECHO Install.wim/Install.esd not found inside DVD source image!
  ECHO ================================================================
  ECHO.
- PAUSE >NUL
  goto end
 )
 
@@ -204,7 +200,6 @@ if not exist "%~dp0DVD\sources\boot.wim" (
  ECHO Boot.wim not found inside DVD source image!
  ECHO ================================================================
  ECHO.
- PAUSE >NUL
  goto end
 )
 
@@ -244,7 +239,6 @@ if not "%checkErrors%"=="0" (
  ECHO or multiple architectures are not supported!
  ECHO ==========================================================================
  ECHO.
- PAUSE >NUL
  goto end
 )
 
@@ -305,7 +299,7 @@ ECHO.
 ECHO Please run UnmountCleanUp.cmd and try again.
 ECHO ================================================================
 ECHO.
-PAUSE >NUL
+EXIT /B 1
 goto end
 
 :imageNotFound
@@ -315,9 +309,9 @@ ECHO Windows 10 IoT Enterprise image not found in ISO/DVD!
 ECHO Please check the ISO/DVD contents and try again.
 ECHO ================================================================
 ECHO.
-PAUSE >NUL
 goto end
 
+:mountedCorrectly
 mkdir "%~dp0mount\Windows\Setup\Scripts" >nul 2>&1
 mkdir "%~dp0DVD\Updates" >nul 2>&1
 echo Please, do not delete.>"%~dp0DVD\Updates\Win10MarkerFile.txt"
@@ -2251,7 +2245,9 @@ ECHO All finished.
 ECHO.
 ECHO Press any key to end the script.
 ECHO.
-PAUSE >NUL
-
+:: Exit script successfully
+EXIT /B 0
 
 :end
+:: Exit script with errors
+EXIT /B 1
